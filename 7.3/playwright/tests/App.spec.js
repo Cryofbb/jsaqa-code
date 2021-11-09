@@ -1,22 +1,29 @@
 const { test, expect } = require("@playwright/test");
+const usr = require("../user");
 
-test("test", async ({ page }) => {
-  // Go to https://netology.ru/free/management#/
-  await page.goto("https://netology.ru/free/management#/");
+test("Wrong password test", async ({ page }) => {
+  await page.goto("https://netology.ru/");
+  await page.screenshot({ path: "Screenshots/WrongPass1.png" });
+  await page.click("text=Войти");
+  await page.screenshot({ path: "Screenshots/WrongPass2.png" });
+  await page.fill('[placeholder="Email"]', "email@email.ru");
+  await page.fill('[placeholder="Пароль"]', "Password");
+  await page.click("text=Войти");
+  await page.screenshot({ path: "Screenshots/WrongPass3.png" });
+  await expect(
+    page.locator("text=Вы ввели неправильно логин или пароль")
+  ).toBeVisible();
+});
 
-  // Click a
-  await page.click("a");
-  await expect(page).toHaveURL("https://netology.ru/");
-
-  // Click text=Учиться бесплатно
-  await page.click("text=Учиться бесплатно");
-  await expect(page).toHaveURL("https://netology.ru/free");
-
-  page.click("text=Бизнес и управление");
-
-  // Click text=Как перенести своё дело в онлайн
-  await page.click("text=Как перенести своё дело в онлайн");
-  await expect(page).toHaveURL(
-    "https://netology.ru/programs/kak-perenesti-svoyo-delo-v-onlajn-bp"
-  );
+test("Correct password test", async ({ page }) => {
+  await page.goto("https://netology.ru/");
+  await page.screenshot({ path: "Screenshots/CorrectPass1.png" });
+  await page.click("text=Войти");
+  await page.screenshot({ path: "Screenshots/CorrectPass2.png" });
+  await page.fill('[placeholder="Email"]', usr.email);
+  await page.fill('[placeholder="Пароль"]', usr.pass);
+  await page.click("text=Войти");
+  await page.screenshot({ path: "Screenshots/CorrectPass3.png" });
+  await expect(page.locator("text=Мои курсы и профессии")).toBeVisible();
+  await page.screenshot({ path: "Screenshots/CorrectPass4.png" });
 });
