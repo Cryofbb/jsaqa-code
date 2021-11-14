@@ -1,7 +1,7 @@
 const { test, expect } = require("@playwright/test");
 const usr = require("../user");
 
-test("Wrong password test", async ({ page }) => {
+test("Should not login with wrong password test", async ({ page }) => {
   await page.goto("https://netology.ru/");
   await page.screenshot({ path: "Screenshots/WrongPass1.png" });
   await page.click("text=Войти");
@@ -15,7 +15,7 @@ test("Wrong password test", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("Correct password test", async ({ page }) => {
+test("Should login with valid auth data test", async ({ page }) => {
   await page.goto("https://netology.ru/");
   await page.screenshot({ path: "Screenshots/CorrectPass1.png" });
   await page.click("text=Войти");
