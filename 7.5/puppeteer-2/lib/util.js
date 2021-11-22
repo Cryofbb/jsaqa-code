@@ -1,12 +1,20 @@
+const { clickElement, getText } = require("./commands.js");
 module.exports = {
-  generateName: function (length) {
-    let name = ""; //здесь будем хранить результат
-    let chars = "abcdefgABCDEFG1234567890"; //возможные символы
-    let charLength = chars.length; //определяем длину
-    for (let i = 0; i < length; i++) {
-      //запускаем цикл для формирования строки
-      name += chars.charAt(Math.floor(Math.random() * charLength));
+  booking: async function (page, day, time, button, row, ...chair) {
+    await clickElement(page, day);
+    await clickElement(page, time);
+    for (let i = 0; i < chair.length; i++) {
+      await clickElement(
+        page,
+        `div.buying-scheme__wrapper > div:nth-child(${row}) > span:nth-child(${chair[i]})`
+      );
     }
-    return name;
+    await clickElement(page, button);
+    await clickElement(page, button);
+  },
+
+  success: async function (page, text) {
+    const actual = await getText(page, "p.ticket__hint");
+    expect(actual).toContain(text);
   },
 };

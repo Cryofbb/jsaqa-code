@@ -1,55 +1,52 @@
 const { clickElement, putText, getText } = require("./lib/commands.js");
-const { generateName } = require("./lib/util.js");
+const { generateName, booking, success } = require("./lib/util.js");
 
 let page;
-
-beforeEach(async () => {
-  page = await browser.newPage();
-  await page.setDefaultNavigationTimeout(0);
-});
+let day = ".page-nav > a:nth-child(6)";
+let time = "a.movie-seances__time";
+let button = "button.acceptin-button";
 
 afterEach(() => {
   page.close();
 });
 
-describe("Netology.ru tests", () => {
+describe("Homework", () => {
   beforeEach(async () => {
     page = await browser.newPage();
-    await page.goto("https://netology.ru");
+    await page.goto("https://qamid.tmweb.ru/client/index.php");
+    await page.setDefaultNavigationTimeout(0);
   });
 
-  test("The first test'", async () => {
-    const title = await page.title();
-    console.log("Page title: " + title);
-    await clickElement(page, "header a + a");
-    const title2 = await page.title();
-    console.log("Page title: " + title2);
-    const pageList = await browser.newPage();
-    await pageList.goto("https://netology.ru/navigation");
-    await pageList.waitForSelector("h1");
+  test("Should book 1 ticket", async () => {
+    await booking(page, day, time, button, 3, 3);
+    await success(
+      page,
+      "Покажите QR-код нашему контроллеру для подтверждения бронирования."
+    );
   });
 
-  test("The first link text 'Медиа Нетологии'", async () => {
-    const actual = await getText(page, "header a + a");
-    expect(actual).toContain("Медиа Нетологии");
+  test("Should book 2 tickets", async () => {
+    await booking(page, day, time, button, 4, 3, 4);
+    await success(
+      page,
+      "Покажите QR-код нашему контроллеру для подтверждения бронирования."
+    );
   });
 
-  test("The first link leads on 'Медиа' page", async () => {
-    await clickElement(page, "header a + a");
-    const actual = await getText(page, ".logo__media");
-    await expect(actual).toContain("Медиа");
+  test("Should not book same ticket again", async () => {
+    await booking(page, day, time, button, 5, 1);
+    await success(
+      page,
+      "Покажите QR-код нашему контроллеру для подтверждения бронирования."
+    );
+    await page.goto("http://qamid.tmweb.ru/client/index.php");
+    await booking(page, day, time, button, 5, 1);
+    expect(
+      String(
+        await page.$eval("button", (button) => {
+          return button.disabled;
+        })
+      )
+    ).toContain("true");
   });
-});
-
-test("Should look for a course", async () => {
-  await page.goto("https://netology.ru/navigation");
-  await putText(page, "input", "тестировщик");
-  const actual = await page.$eval("a[data-name]", (link) => link.textContent);
-  const expected = "Тестировщик ПО";
-  expect(actual).toContain(expected);
-});
-
-test("Should show warning if login is not email", async () => {
-  await page.goto("https://netology.ru/?modal=sign_in");
-  await putText(page, 'input[type="email"]', generateName(5));
 });
